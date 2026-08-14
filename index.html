@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kyora IQ &mdash; Funding Finder</title>
-<meta name="description" content="Verified grants, scholarships and live federal funding search. Every curated entry confirmed at source.">
+<meta name="description" content="Grants for small businesses and scholarships for cybersecurity students, plus live federal grant search. Free and public.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -273,7 +273,7 @@ footer{border-top:1px solid var(--line);background:var(--card)}
       <span class="flabel">Who</span>
       <button class="chip on" data-aud="">Everyone</button>
       <button class="chip" data-aud="business">Businesses</button>
-      <button class="chip" data-aud="individual">Individuals</button>
+      <button class="chip" data-aud="individual">Students</button>
     </div>
     <div class="filters">
       <span class="flabel">Filter</span>
@@ -302,6 +302,12 @@ footer{border-top:1px solid var(--line);background:var(--card)}
         <option value="checked">Recently confirmed</option>
       </select>
     </div>
+  </div>
+
+  <div id="stale" class="hidden" style="background:var(--warn-bg);border:1px solid #f0dcb8;
+       border-radius:11px;padding:12px 16px;margin-bottom:14px;font-size:13px;color:var(--warn)">
+    Showing the most recently published copy of this list. The live version could not be
+    reached, so a very recent addition may be missing.
   </div>
 
   <div class="grid" id="list"></div>
@@ -352,7 +358,7 @@ function curatedCard(r){
                    : `<span class="tag tag-fee">Fee ${esc(r.fee)}</span>`);
   if (r.timing)    t.push(`<span class="tag">${esc(r.timing)}</span>`);
   if (r.geography) t.push(`<span class="tag">${esc(r.geography)}</span>`);
-  t.push(`<span class="tag">${r.audience==='business'?'For businesses':'For individuals'}</span>`);
+  t.push(`<span class="tag">${r.audience==='business'?'For businesses':'For students'}</span>`);
   return `<div class="card">
     <div class="ctop">
       <h3><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.name)}</a></h3>
@@ -472,7 +478,7 @@ function render(){
 
   rows.sort((a,b) =>
     sortBy==='name'    ? a.name.localeCompare(b.name)
-  : sortBy==='checked' ? b.checkedOn.localeCompare(a.checkedOn)
+  : sortBy==='checked' ? (b.checkedOn||'').localeCompare(a.checkedOn||'')
   : amountVal(b)-amountVal(a));
 
   document.getElementById('count').innerHTML = rows.length
@@ -521,21 +527,56 @@ document.getElementById('q').addEventListener('keydown', e => {
 document.getElementById('go').onclick = submitSearch;
 document.getElementById('sort').onchange = e => { sortBy=e.target.value; render(); };
 
-/* Data lives in its own file so updating the list never touches the
-   page. Regenerate data.json, commit, and the site is current. */
-fetch('data.json', { cache: 'no-cache' })
-  .then(r => r.json())
-  .then(rows => {
-    DATA = rows;
-    document.getElementById('m-total').textContent = DATA.length;
-    document.getElementById('pill-curated').textContent = DATA.length;
-    document.getElementById('m-free').textContent = DATA.filter(isFree).length;
-    render();
-  })
-  .catch(() => {
+/* ---------------------------------------------------------------
+   Loading the list
+
+   Read live from a database view that exposes only confirmed rows and
+   only publishable columns. That means checking something in the Hub
+   shows here immediately, with no export step and nothing to keep in
+   sync.
+
+   data.json is the fallback, written at deploy time. If the live read
+   fails the site still works - a little behind, and it says so, rather
+   than showing nothing.
+   --------------------------------------------------------------- */
+async function loadData(){
+  let rows = null, live = false;
+
+  try {
+    const res = await fetch('/api/list', { cache: 'no-cache' });
+    if (res.ok) {
+      const json = await res.json();
+      if (Array.isArray(json.rows) && json.rows.length) { rows = json.rows; live = true; }
+    }
+  } catch (_) { /* fall through to the shipped copy */ }
+
+  if (!rows) {
+    try {
+      const res = await fetch('data.json', { cache: 'no-cache' });
+      rows = await res.json();
+    } catch (_) { rows = null; }
+  }
+
+  if (!rows) {
     document.getElementById('list').innerHTML =
       '<div class="empty"><b>The list could not be loaded</b>Try refreshing the page.</div>';
-  });
+    return;
+  }
+
+  DATA = rows;
+  document.getElementById('m-total').textContent = DATA.length;
+  document.getElementById('pill-curated').textContent = DATA.length;
+  document.getElementById('m-free').textContent = DATA.filter(isFree).length;
+
+  if (!live) {
+    const el = document.getElementById('stale');
+    if (el) el.classList.remove('hidden');
+  }
+
+  render();
+}
+
+loadData();
 </script>
 </body>
 </html>
