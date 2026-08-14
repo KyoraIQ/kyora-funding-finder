@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kyora IQ &mdash; Funding Finder</title>
+<meta name="description" content="Verified grants, scholarships and live federal funding search. Every curated entry confirmed at source.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --page:#f7f9fc; --card:#fff; --raised:#f4f7fb; --icon:#e8f0fb;
+  --h:#0a1c38; --body:#1e293b; --muted:#4a5a70; --hint:#7688a0;
+  --line:#e4eaf2; --line-soft:#f0f4f9;
+  --navy:#0a1628; --info:#2563d4; --cyan:#00d4ff; --violet:#6d5ae6;
+  --ok:#0d7a6f; --ok-bg:#e4f4f1;
+  --warn:#a8560a; --warn-bg:#fdf2e2;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:Inter,system-ui,sans-serif;background:var(--page);color:var(--body);
+  -webkit-font-smoothing:antialiased;font-size:14px;line-height:1.55}
+a{color:var(--info)}
+
+/* ============ HERO ============ */
+.hero{position:relative;overflow:hidden;
+  background:
+    radial-gradient(900px 460px at 88% -10%, rgba(0,212,255,.20), transparent 62%),
+    radial-gradient(700px 420px at 8% 108%, rgba(109,90,230,.26), transparent 60%),
+    linear-gradient(165deg,#0a1628 0%,#0f2545 58%,#122c52 100%);
+  color:#fff}
+.hero::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px);
+  background-size:52px 52px;mask-image:radial-gradient(circle at 60% 25%,#000,transparent 72%)}
+.hero-in{position:relative;z-index:1;width:100%;padding:20px clamp(24px,4vw,64px) 54px}
+
+.nav{display:flex;align-items:center;margin-bottom:44px}
+.brand{display:flex;align-items:center;gap:11px}
+.mark{width:34px;height:34px;border-radius:9px;
+  background:linear-gradient(135deg,var(--cyan),var(--info));
+  display:grid;place-items:center;font-weight:800;font-size:15px;color:#04121f;
+  box-shadow:0 4px 18px rgba(0,212,255,.32)}
+.bt{font-size:15px;font-weight:600;letter-spacing:-.01em}
+.bs{font-size:11px;color:#8fb6dd;letter-spacing:.05em;text-transform:uppercase;font-weight:500}
+.nav a{color:#c3d9f0;font-size:13.5px;text-decoration:none}
+.nav a:hover{color:#fff}
+
+.eyebrow{display:inline-flex;align-items:center;gap:7px;padding:5px 13px;border-radius:20px;
+  background:rgba(0,212,255,.11);border:1px solid rgba(0,212,255,.26);
+  font-size:11.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+  color:#7fe4ff;margin-bottom:20px}
+.dot{width:6px;height:6px;border-radius:50%;background:#00d4ff;
+  box-shadow:0 0 0 0 rgba(0,212,255,.6);animation:pulse 2.4s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 8px rgba(0,212,255,0)}100%{box-shadow:0 0 0 0 rgba(0,212,255,0)}}
+
+h1{font-size:clamp(38px,4.4vw,62px);font-weight:700;letter-spacing:-.035em;
+  line-height:1.05;margin-bottom:18px;max-width:17ch}
+h1 .grad{background:linear-gradient(100deg,#00d4ff 10%,#8ab4ff 55%,#b9a4ff 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.lede{color:#bcd3ec;font-size:clamp(15.5px,1.15vw,18px);max-width:60ch;line-height:1.62}
+
+.hero-cols{display:grid;grid-template-columns:minmax(0,1fr) 360px;
+  gap:clamp(40px,6vw,90px);align-items:start}
+
+.hero-panel{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);
+  border-radius:16px;padding:24px 24px 22px;backdrop-filter:blur(10px);
+  box-shadow:0 16px 46px rgba(2,10,24,.3);position:relative;overflow:hidden}
+.hero-panel::after{content:'';position:absolute;right:-58px;top:-58px;width:190px;height:190px;
+  border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,.22),transparent 70%)}
+.hp-eyebrow{font-size:10.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
+  color:#7fe4ff;margin-bottom:9px;position:relative}
+.hero-panel h2{font-size:20px;font-weight:600;letter-spacing:-.02em;margin-bottom:9px;
+  line-height:1.25;position:relative}
+.hero-panel p{font-size:13.5px;color:#bcd3ec;line-height:1.6;margin-bottom:18px;position:relative}
+.hp-btn{display:block;text-align:center;padding:12px 18px;border-radius:10px;
+  background:linear-gradient(135deg,var(--cyan),#4db8ff);color:#04121f;
+  font-size:14px;font-weight:600;text-decoration:none;position:relative;
+  box-shadow:0 4px 16px rgba(0,212,255,.26)}
+.hp-btn:hover{filter:brightness(1.07)}
+.hp-foot{font-size:11.5px;color:#8fb6dd;margin-top:11px;text-align:center;position:relative}
+
+.metrics{display:flex;flex-wrap:wrap;gap:10px;margin-top:34px}
+.metric{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.11);
+  border-radius:13px;padding:14px 20px;backdrop-filter:blur(8px);min-width:132px}
+.m-n{font-size:26px;font-weight:700;letter-spacing:-.02em;line-height:1}
+.m-n.cy{color:#7fe4ff}
+.m-l{font-size:11.5px;color:#8fb6dd;margin-top:5px}
+
+/* ============ SEARCH DECK ============ */
+.deck{width:100%;margin:-30px 0 0;padding:0 clamp(24px,4vw,64px);position:relative;z-index:5}
+.deck-card{background:var(--card);border:1px solid var(--line);border-radius:16px;
+  box-shadow:0 2px 6px rgba(10,28,56,.05),0 14px 44px rgba(10,28,56,.11);padding:8px}
+
+.modes{display:flex;gap:3px;padding:4px;background:var(--raised);border-radius:11px;margin-bottom:8px}
+.mode{flex:1;padding:11px 14px;border:0;background:none;border-radius:8px;cursor:pointer;
+  font:inherit;font-size:13.5px;font-weight:500;color:var(--muted);transition:.14s;
+  display:flex;align-items:center;justify-content:center;gap:8px}
+.mode:hover{color:var(--h)}
+.mode.on{background:var(--card);color:var(--h);font-weight:600;
+  box-shadow:0 1px 3px rgba(10,28,56,.1)}
+.mode .pill{font-size:10px;padding:1px 7px;border-radius:20px;font-weight:600;
+  background:var(--icon);color:var(--info)}
+.mode.on .pill{background:var(--info);color:#fff}
+.mode .live{background:var(--ok-bg);color:var(--ok)}
+.mode.on .live{background:var(--ok);color:#fff}
+
+.searchbox{display:flex;gap:9px;padding:6px 6px 8px}
+.searchbox input{flex:1;padding:14px 17px;border-radius:11px;font-size:15.5px;font-family:inherit;
+  background:var(--raised);border:1px solid transparent;color:var(--body)}
+.searchbox input::placeholder{color:var(--hint)}
+.searchbox input:focus{outline:none;background:var(--card);border-color:var(--info);
+  box-shadow:0 0 0 3px rgba(37,99,212,.11)}
+.go{padding:14px 26px;border-radius:11px;border:0;cursor:pointer;font:inherit;
+  font-size:15px;font-weight:600;color:#fff;
+  background:linear-gradient(135deg,var(--info),#1d4fb0);
+  box-shadow:0 3px 12px rgba(37,99,212,.3)}
+.go:hover{filter:brightness(1.08)}
+
+.hint{padding:0 12px 10px;font-size:12.5px;color:var(--hint)}
+.hint b{color:var(--muted);font-weight:500}
+
+/* ============ BODY ============ */
+.wrap{width:100%;padding:30px clamp(24px,4vw,64px) 80px}
+
+.filters{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-bottom:9px}
+.flabel{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--hint);margin-right:5px;min-width:52px}
+.chip{padding:6px 13px;border-radius:20px;font-size:12.5px;cursor:pointer;font-family:inherit;
+  background:var(--card);border:1px solid var(--line);color:var(--muted);transition:.12s}
+.chip:hover{border-color:var(--info);color:var(--info)}
+.chip.on{background:var(--h);border-color:var(--h);color:#fff;font-weight:500}
+
+.bar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;
+  margin:22px 0 14px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.count{font-size:13.5px;color:var(--muted)}
+.count b{color:var(--h);font-weight:700;font-size:15px}
+.sort select{font-family:inherit;font-size:12.5px;padding:5px 9px;border-radius:7px;
+  border:1px solid var(--line);background:var(--card);color:var(--body)}
+
+/* ---- cards ---- */
+.grid{display:grid;gap:12px;
+  grid-template-columns:repeat(auto-fill,minmax(460px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:13px;
+  padding:19px 21px;transition:.14s;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:linear-gradient(180deg,var(--cyan),var(--info));opacity:0;transition:.14s}
+.card:hover{border-color:#cfdcec;box-shadow:0 3px 16px rgba(10,28,56,.08);transform:translateY(-1px)}
+.card:hover::before{opacity:1}
+.ctop{display:flex;flex-wrap:wrap;align-items:flex-start;gap:14px;margin-bottom:5px}
+.card h3{font-size:16px;font-weight:600;flex:1;min-width:230px;line-height:1.34;letter-spacing:-.01em}
+.card h3 a{color:var(--h);text-decoration:none}
+.card h3 a:hover{color:var(--info)}
+.award{font-size:15.5px;font-weight:700;color:var(--h);white-space:nowrap;letter-spacing:-.015em}
+.focus{font-size:13.5px;color:var(--muted);margin-bottom:9px}
+.note{font-size:12.5px;color:var(--muted);background:var(--raised);
+  border-left:3px solid var(--info);border-radius:0 7px 7px 0;padding:10px 13px;margin-bottom:11px}
+.meta{display:flex;flex-wrap:wrap;gap:7px}
+.tag{padding:3px 10px;border-radius:5px;font-size:11px;font-weight:500;
+  background:var(--icon);color:var(--muted)}
+.tag-free{background:var(--ok-bg);color:var(--ok);font-weight:600}
+.tag-fee{background:var(--warn-bg);color:var(--warn);font-weight:600}
+.tag-chk{background:var(--ok-bg);color:var(--ok);font-weight:600}
+.tag-live{background:#e8f0fb;color:var(--info);font-weight:600}
+
+.empty{text-align:center;padding:60px 20px;color:var(--hint);font-size:14px}
+.empty b{display:block;color:var(--h);font-size:17px;margin-bottom:7px;font-weight:600}
+
+.livenote{background:linear-gradient(135deg,#0a1628,#12305a);color:#c3d9f0;
+  border-radius:13px;padding:17px 20px;margin-bottom:18px;font-size:13.5px;line-height:1.6}
+.livenote b{color:#7fe4ff;display:block;margin-bottom:3px;font-size:14px}
+
+/* ---- suggest ---- */
+.suggest{background:linear-gradient(135deg,#0a1628,#14335e);color:#fff;
+  border-radius:16px;padding:30px 32px;margin-top:40px;position:relative;overflow:hidden}
+.suggest::after{content:'';position:absolute;right:-70px;top:-70px;width:250px;height:250px;
+  border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,.2),transparent 68%)}
+.suggest h2{font-size:21px;margin-bottom:7px;letter-spacing:-.02em;position:relative}
+.suggest p{font-size:14px;color:#bcd3ec;margin-bottom:17px;max-width:600px;position:relative}
+.sg{display:flex;flex-wrap:wrap;gap:9px;position:relative}
+.sg input{flex:1;min-width:210px;padding:12px 15px;border-radius:10px;font-size:14px;
+  font-family:inherit;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:#fff}
+.sg input::placeholder{color:#8fb6dd}
+.sg input:focus{outline:none;background:rgba(255,255,255,.16);border-color:var(--cyan)}
+.sg button{padding:12px 26px;border-radius:10px;border:0;cursor:pointer;font:inherit;
+  font-weight:600;font-size:14px;color:#04121f;
+  background:linear-gradient(135deg,var(--cyan),#4db8ff)}
+.sgn{font-size:12px;color:#8fb6dd;margin-top:11px;position:relative}
+
+footer{border-top:1px solid var(--line);background:var(--card)}
+.ft{width:100%;padding:26px clamp(24px,4vw,64px) 50px;font-size:12.5px;
+  color:var(--hint);line-height:1.7}
+.ft b{color:var(--muted)}
+.hidden{display:none!important}
+
+@media(max-width:940px){
+  .hero-cols{grid-template-columns:1fr;gap:30px}
+  .hero-panel{max-width:none}
+}
+@media(max-width:640px){
+  h1{font-size:34px}
+  .lede{font-size:15px}
+  .mode{font-size:12.5px;padding:10px 8px}
+  .mode .pill{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-in">
+    <div class="nav">
+      <div class="brand">
+        <div class="mark">K</div>
+        <div><div class="bt">Kyora IQ</div><div class="bs">Funding Finder</div></div>
+      </div>
+    </div>
+
+    <div class="hero-cols">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="dot"></span>Every entry read at the source</div>
+
+        <h1>Stop chasing grants that <span class="grad">closed two years ago</span></h1>
+        <p class="lede">A curated list where someone actually opened every link &mdash; plus live
+        search across every federal grant in the United States. No scraped aggregators, no dead
+        cycles, no programmes that quietly ended.</p>
+
+        <div class="metrics">
+          <div class="metric"><div class="m-n cy" id="m-total">&mdash;</div><div class="m-l">Curated &amp; confirmed</div></div>
+          <div class="metric"><div class="m-n" id="m-free">&mdash;</div><div class="m-l">Free to apply</div></div>
+          <div class="metric"><div class="m-n">2,000+</div><div class="m-l">Live federal</div></div>
+        </div>
+      </div>
+
+      <aside class="hero-panel">
+        <div class="hp-eyebrow">Help us build it</div>
+        <h2>Know one we&rsquo;ve missed?</h2>
+        <p>Send the link. Every suggestion is opened and read before it joins the list &mdash;
+        that check is the entire point of this page.</p>
+        <a href="#suggest" class="hp-btn">Suggest a programme</a>
+        <div class="hp-foot">No email needed. Nothing stored about you.</div>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<div class="deck">
+  <div class="deck-card">
+    <div class="modes">
+      <button class="mode on" data-mode="curated">
+        Curated list <span class="pill" id="pill-curated">21</span>
+      </button>
+      <button class="mode" data-mode="federal">
+        Federal grants <span class="pill live">Live</span>
+      </button>
+    </div>
+
+    <div class="searchbox">
+      <input id="q" placeholder="Try women-owned, veteran, aviation, cybersecurity, Florida">
+      <button class="go" id="go">Search</button>
+    </div>
+    <div class="hint" id="hint">
+      <b>Curated:</b> programmes we have opened and read ourselves. Filters below.
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div id="curated-filters">
+    <div class="filters">
+      <span class="flabel">Who</span>
+      <button class="chip on" data-aud="">Everyone</button>
+      <button class="chip" data-aud="business">Businesses</button>
+      <button class="chip" data-aud="individual">Individuals</button>
+    </div>
+    <div class="filters">
+      <span class="flabel">Filter</span>
+      <button class="chip on" data-f="">All</button>
+      <button class="chip" data-f="free">Free to apply</button>
+      <button class="chip" data-f="equity">Women or minority</button>
+      <button class="chip" data-f="veteran">Veteran</button>
+      <button class="chip" data-f="florida">Florida</button>
+      <button class="chip" data-f="recurring">Recurring</button>
+    </div>
+  </div>
+
+  <div id="federal-note" class="livenote hidden">
+    <b>Searching Grants.gov live</b>
+    Results come from the federal grants database as you search &mdash; nothing stored about
+    you, no account needed. These are mostly for nonprofits, universities and government bodies;
+    very few are open to a for-profit business. Every result links to its official listing.
+  </div>
+
+  <div class="bar">
+    <div class="count" id="count"></div>
+    <div class="sort" id="sortwrap">Sort
+      <select id="sort">
+        <option value="amount">Largest award</option>
+        <option value="name">Name</option>
+        <option value="checked">Recently confirmed</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="grid" id="list"></div>
+
+  <div class="suggest" id="suggest">
+    <h2>Know one we&rsquo;ve missed?</h2>
+    <p>Send the link. Every suggestion gets opened and read before it joins the list, so it may
+    take a little while to appear &mdash; that check is the entire point of this page.</p>
+    <form class="sg" onsubmit="event.preventDefault();alert('Mockup \u2014 the form is not wired up yet.')">
+      <input type="url" placeholder="Link to the programme" required>
+      <input type="text" placeholder="Anything we should know (optional)">
+      <button type="submit">Send it over</button>
+    </form>
+    <div class="sgn">No email needed. No newsletter, no follow-up.</div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="ft">
+    <b>Kyora IQ</b> provides cybersecurity education and builds for cybersecurity and technology
+    workforce training. We keep this list for our own work and publish it because a checked list
+    beats a long one.<br><br>
+    Federal results come live from Grants.gov. Curated entries carry the date we last confirmed
+    them &mdash; programmes change without notice, so always check the funder&rsquo;s own page
+    before applying. Information only, not financial, tax or legal advice.
+  </div>
+</footer>
+
+<script>
+let DATA = [];
+
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c =>
+  ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmtDate = iso => new Date(iso+'T00:00:00Z')
+  .toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+const isFree = r => !r.fee || /free/i.test(r.fee);
+const amountVal = r => {
+  const n = (r.award||'').match(/[\d,]+/g) || [];
+  return Math.max(0, ...n.map(x => parseInt(x.replace(/,/g,''),10)||0));
+};
+
+let mode = 'curated', aud = '', filt = '', sortBy = 'amount';
+
+function curatedCard(r){
+  const t = [`<span class="tag tag-chk">Confirmed ${esc(fmtDate(r.checkedOn))}</span>`];
+  t.push(isFree(r) ? '<span class="tag tag-free">Free to apply</span>'
+                   : `<span class="tag tag-fee">Fee ${esc(r.fee)}</span>`);
+  if (r.timing)    t.push(`<span class="tag">${esc(r.timing)}</span>`);
+  if (r.geography) t.push(`<span class="tag">${esc(r.geography)}</span>`);
+  t.push(`<span class="tag">${r.audience==='business'?'For businesses':'For individuals'}</span>`);
+  return `<div class="card">
+    <div class="ctop">
+      <h3><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.name)}</a></h3>
+      ${r.award?`<span class="award">${esc(r.award)}</span>`:''}
+    </div>
+    ${r.focus?`<div class="focus">${esc(r.focus)}</div>`:''}
+    ${r.notes?`<div class="note">${esc(r.notes)}</div>`:''}
+    <div class="meta">${t.join('')}</div>
+  </div>`;
+}
+
+function federalCard(r){
+  const days = r.closeDate
+    ? Math.round((new Date(r.closeDate)-new Date())/864e5) : null;
+  const t = ['<span class="tag tag-live">Live from Grants.gov</span>'];
+  if (r.agency) t.push(`<span class="tag">${esc(r.agency)}</span>`);
+  if (days!==null && days>=0) t.push(`<span class="tag ${days<=30?'tag-fee':''}">Closes in ${days} days</span>`);
+  if (r.number) t.push(`<span class="tag">${esc(r.number)}</span>`);
+  return `<div class="card">
+    <div class="ctop">
+      <h3><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.title)}</a></h3>
+      ${r.closeDate?`<span class="award">${esc(r.closeDate)}</span>`:''}
+    </div>
+    <div class="meta">${t.join('')}</div>
+  </div>`;
+}
+
+/* ---------------------------------------------------------------
+   Grants.gov live search
+
+   Called straight from the browser. Whether that works depends on
+   Grants.gov sending CORS headers - their API is built for
+   server-to-server use and may refuse a browser request. If it does,
+   the tab says so and links out rather than showing an empty result
+   and letting the visitor assume there is nothing there.
+   --------------------------------------------------------------- */
+/* Our own endpoint, not Grants.gov directly. Grants.gov sends no CORS
+   headers, so a browser cannot call it - /api/grants makes the request
+   server-side where that rule does not apply. Same origin, so nothing
+   here is a cross-site request. */
+let federalRows = [], federalState = 'idle', federalMsg = '';
+
+async function searchFederal(keyword){
+  federalState = 'loading'; render();
+  try {
+    const res = await fetch('/api/grants?q=' + encodeURIComponent(keyword));
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || ('HTTP ' + res.status));
+    federalRows = json.results || [];
+    federalState = federalRows.length ? 'ok' : 'empty';
+  } catch (err) {
+    federalState = 'error';
+    federalMsg = String(err && err.message || err);
+  }
+  render();
+}
+
+function render(){
+  const q = document.getElementById('q').value.toLowerCase().trim();
+  const list = document.getElementById('list');
+
+  if (mode === 'federal'){
+    const c = document.getElementById('count');
+
+    if (federalState === 'loading'){
+      c.innerHTML = '';
+      list.innerHTML = '<div class="empty"><b>Searching Grants.gov</b>Live results, one moment.</div>';
+      return;
+    }
+
+    if (federalState === 'error'){
+      c.innerHTML = '';
+      list.innerHTML = `<div class="empty"><b>Grants.gov did not respond</b>
+        ${esc(federalMsg)}. It is usually brief &mdash; try again in a moment,
+        or search Grants.gov directly.
+        <div style="margin-top:18px">
+          <a class="hp-btn" style="display:inline-block;padding:12px 24px"
+             href="https://www.grants.gov/search-grants?keyword=${encodeURIComponent(q)}"
+             target="_blank" rel="noopener">Search Grants.gov for &ldquo;${esc(q)}&rdquo;</a>
+        </div></div>`;
+      return;
+    }
+
+    if (federalState === 'empty'){
+      c.innerHTML = '';
+      list.innerHTML = `<div class="empty"><b>No federal grants matched</b>
+        Try broader wording. Federal listings favour formal terms &mdash;
+        &ldquo;workforce development&rdquo; finds more than &ldquo;job training&rdquo;.</div>`;
+      return;
+    }
+
+    if (federalState === 'ok'){
+      c.innerHTML = `<b>${federalRows.length}</b> federal opportunities`;
+      list.innerHTML = federalRows.map(federalCard).join('');
+      return;
+    }
+
+    c.innerHTML = '';
+    list.innerHTML = `<div class="empty"><b>Search every federal grant</b>
+      Type what you do &mdash; workforce training, cybersecurity, adult education &mdash;
+      then press Search. Results come live from Grants.gov, nothing stored.</div>`;
+    return;
+  }
+
+  let rows = DATA.filter(r => {
+    if (aud && r.audience !== aud) return false;
+    if (filt==='free' && !isFree(r)) return false;
+    if (filt==='equity' && !/women|minorit|black|latina|hispanic|colour|color|disadvantaged/i
+        .test((r.focus||'')+(r.notes||'')+r.name)) return false;
+    if (filt==='veteran' && !/veteran/i.test((r.focus||'')+(r.notes||'')+r.name)) return false;
+    if (filt==='florida' && !/florida|orlando|central/i.test((r.geography||'')+(r.notes||''))) return false;
+    if (filt==='recurring' && !/monthly|quarterly|rolling|recurring|cycle/i.test(r.timing||'')) return false;
+    if (!q) return true;
+    return [r.name,r.focus,r.notes,r.geography,r.timing,r.award,r.fee]
+      .filter(Boolean).join(' ').toLowerCase().includes(q);
+  });
+
+  rows.sort((a,b) =>
+    sortBy==='name'    ? a.name.localeCompare(b.name)
+  : sortBy==='checked' ? b.checkedOn.localeCompare(a.checkedOn)
+  : amountVal(b)-amountVal(a));
+
+  document.getElementById('count').innerHTML = rows.length
+    ? `<b>${rows.length}</b> ${rows.length===1?'programme':'programmes'}` : '';
+  list.innerHTML = rows.length ? rows.map(curatedCard).join('')
+    : `<div class="empty"><b>Nothing matches that</b>
+       Try a single word, or clear the filters. The list is deliberately short &mdash;
+       we only publish what we have checked.</div>`;
+}
+
+document.querySelectorAll('.mode').forEach(m => m.onclick = () => {
+  document.querySelectorAll('.mode').forEach(x => x.classList.remove('on'));
+  m.classList.add('on'); mode = m.dataset.mode;
+  const fed = mode === 'federal';
+  document.getElementById('curated-filters').classList.toggle('hidden', fed);
+  document.getElementById('federal-note').classList.toggle('hidden', !fed);
+  document.getElementById('sortwrap').classList.toggle('hidden', fed);
+  document.getElementById('q').placeholder = fed
+    ? 'Try cybersecurity training, adult education, apprenticeship'
+    : 'Try women-owned, veteran, aviation, cybersecurity, Florida';
+  document.getElementById('hint').innerHTML = fed
+    ? '<b>Federal:</b> searches Grants.gov live. Mostly nonprofits, universities and government.'
+    : '<b>Curated:</b> programmes we have opened and read ourselves. Filters below.';
+  if (fed) federalState = 'idle';
+  render();
+});
+
+document.querySelectorAll('[data-aud]').forEach(c => c.onclick = () => {
+  document.querySelectorAll('[data-aud]').forEach(x=>x.classList.remove('on'));
+  c.classList.add('on'); aud=c.dataset.aud; render();
+});
+document.querySelectorAll('[data-f]').forEach(c => c.onclick = () => {
+  document.querySelectorAll('[data-f]').forEach(x=>x.classList.remove('on'));
+  c.classList.add('on'); filt=c.dataset.f; render();
+});
+function submitSearch(){
+  const q = document.getElementById('q').value.trim();
+  if (mode === 'federal'){
+    if (q) searchFederal(q); else { federalState='idle'; render(); }
+  } else render();
+}
+document.getElementById('q').oninput = () => { if (mode !== 'federal') render(); };
+document.getElementById('q').addEventListener('keydown', e => {
+  if (e.key === 'Enter'){ e.preventDefault(); submitSearch(); }
+});
+document.getElementById('go').onclick = submitSearch;
+document.getElementById('sort').onchange = e => { sortBy=e.target.value; render(); };
+
+/* Data lives in its own file so updating the list never touches the
+   page. Regenerate data.json, commit, and the site is current. */
+fetch('data.json', { cache: 'no-cache' })
+  .then(r => r.json())
+  .then(rows => {
+    DATA = rows;
+    document.getElementById('m-total').textContent = DATA.length;
+    document.getElementById('pill-curated').textContent = DATA.length;
+    document.getElementById('m-free').textContent = DATA.filter(isFree).length;
+    render();
+  })
+  .catch(() => {
+    document.getElementById('list').innerHTML =
+      '<div class="empty"><b>The list could not be loaded</b>Try refreshing the page.</div>';
+  });
+</script>
+</body>
+</html>
