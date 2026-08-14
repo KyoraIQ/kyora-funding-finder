@@ -257,7 +257,7 @@ footer{border-top:1px solid var(--line);background:var(--card)}
     </div>
 
     <div class="searchbox">
-      <input id="q" placeholder="Try women-owned, veteran, aviation, cybersecurity, Florida">
+      <input id="q" placeholder="Try women-owned, veteran, cybersecurity, scholarships, monthly">
       <button class="go" id="go">Search</button>
     </div>
     <div class="hint" id="hint">
@@ -316,12 +316,15 @@ footer{border-top:1px solid var(--line);background:var(--card)}
     <h2>Know one we&rsquo;ve missed?</h2>
     <p>Send the link. Every suggestion gets opened and read before it joins the list, so it may
     take a little while to appear &mdash; that check is the entire point of this page.</p>
-    <form class="sg" onsubmit="event.preventDefault();alert('Mockup \u2014 the form is not wired up yet.')">
-      <input type="url" placeholder="Link to the programme" required>
-      <input type="text" placeholder="Anything we should know (optional)">
-      <button type="submit">Send it over</button>
+    <form class="sg" id="sg-form">
+      <input type="url" name="url" id="sg-url" placeholder="Link to the programme" required>
+      <input type="text" name="note" id="sg-note" placeholder="Anything we should know (optional)">
+      <button type="submit" id="sg-btn">Send it over</button>
+      <!-- Not visible to a person. Bots fill in everything. -->
+      <input type="text" name="website" id="sg-hp" tabindex="-1" autocomplete="off"
+             aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px">
     </form>
-    <div class="sgn">No email needed. No newsletter, no follow-up.</div>
+    <div class="sgn" id="sg-msg">No email needed. No newsletter, no follow-up.</div>
   </div>
 
 </div>
@@ -498,7 +501,7 @@ document.querySelectorAll('.mode').forEach(m => m.onclick = () => {
   document.getElementById('sortwrap').classList.toggle('hidden', fed);
   document.getElementById('q').placeholder = fed
     ? 'Try cybersecurity training, adult education, apprenticeship'
-    : 'Try women-owned, veteran, aviation, cybersecurity, Florida';
+    : 'Try women-owned, veteran, cybersecurity, scholarships, monthly';
   document.getElementById('hint').innerHTML = fed
     ? '<b>Federal:</b> searches Grants.gov live. Mostly nonprofits, universities and government.'
     : '<b>Curated:</b> programmes we have opened and read ourselves. Filters below.';
@@ -577,6 +580,52 @@ async function loadData(){
 }
 
 loadData();
+
+/* ---------------------------------------------------------------
+   Suggestions
+
+   Posts to our own endpoint, which checks the link, rate limits by a
+   hash of the sender, and writes to a review queue. Nothing appears
+   on this page until a person has read it.
+   --------------------------------------------------------------- */
+const sgForm = document.getElementById('sg-form');
+if (sgForm) sgForm.onsubmit = async e => {
+  e.preventDefault();
+  const btn = document.getElementById('sg-btn');
+  const msg = document.getElementById('sg-msg');
+  const url = document.getElementById('sg-url').value.trim();
+  if (!url) return;
+
+  btn.disabled = true; btn.textContent = 'Sending...';
+  msg.textContent = '';
+
+  try {
+    const res = await fetch('/api/suggest', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url,
+        note: document.getElementById('sg-note').value.trim(),
+        website: document.getElementById('sg-hp').value
+      })
+    });
+    const json = await res.json().catch(() => ({}));
+
+    if (res.ok) {
+      sgForm.reset();
+      btn.textContent = 'Thank you';
+      msg.textContent = json.message
+        || 'Got it. Someone will open the link and read it before it joins the list.';
+      setTimeout(() => { btn.disabled = false; btn.textContent = 'Send it over'; }, 4000);
+    } else {
+      btn.disabled = false; btn.textContent = 'Send it over';
+      msg.textContent = json.error || 'That could not be sent. Try again shortly.';
+    }
+  } catch (_) {
+    btn.disabled = false; btn.textContent = 'Send it over';
+    msg.textContent = 'That could not be sent. Check your connection and try again.';
+  }
+};
 </script>
 </body>
 </html>
